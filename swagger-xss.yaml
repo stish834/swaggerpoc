@@ -1,0 +1,124 @@
+openapi: 3.0.0
+info:
+  title: Swagger XSS Demo
+  description: API showing different XSS types
+  version: "1.0.0"
+servers:
+  - url: https://api.xss-demo.com
+
+paths:
+  /search:
+    get:
+      summary: Reflected XSS Vulnerability Example
+      description: |
+        This endpoint is vulnerable to reflected XSS when unsanitized input is returned in the response.
+      parameters:
+        - in: query
+          name: query
+          schema:
+            type: string
+          required: true
+          example: '"><script>alert(1)</script>'
+          description: |
+            If the input is not properly sanitized, it will trigger a reflected XSS vulnerability.
+      responses:
+        '200':
+          description: Successful response with user input echoed.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Search results for: "><script>alert(1)</script>'
+                  results:
+                    type: array
+                    items:
+                      type: string
+                      example: "Example data"
+
+  /feedback:
+    post:
+      summary: Stored XSS Vulnerability Example
+      description: |
+        This endpoint accepts user feedback and stores it in the database, but if the input is not sanitized, it can lead to stored XSS.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: 'JohnDoe'
+                feedback:
+                  type: string
+                  example: '<script>alert(document.cookie)</script>'
+                  description: |
+                    Malicious feedback stored in the database and rendered later on the admin panel can trigger stored XSS.
+      responses:
+        '201':
+          description: Feedback successfully submitted.
+        '400':
+          description: Bad request.
+          
+  /admin-panel:
+    get:
+      summary: Admin Panel View with Stored XSS Example
+      description: |
+        This endpoint shows how stored feedback could trigger stored XSS if it is not properly encoded when displayed in the admin panel.
+      responses:
+        '200':
+          description: Successful response with stored feedback.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  feedbacks:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        username:
+                          type: string
+                          example: 'JohnDoe'
+                        feedback:
+                          type: string
+                          example: '<script>alert(document.cookie)</script>'
+                        
+  /dom-xss-demo:
+    get:
+      summary: DOM-Based XSS Vulnerability Example
+      description: |
+        This endpoint includes an HTML response that uses JavaScript to reflect unsanitized user input, causing a DOM-based XSS.
+      parameters:
+        - in: query
+          name: input
+          schema:
+            type: string
+          required: true
+          example: '"><img src=x onerror=alert(1)>'
+          description: |
+            DOM-based XSS occurs when the user input is dynamically inserted into the DOM without sanitization.
+      responses:
+        '200':
+          description: Successful HTML response.
+          content:
+            text/html:
+              schema:
+                type: string
+                example: |
+                  <html>
+                    <head><title>DOM XSS Demo</title></head>
+                    <body>
+                      <h1>DOM XSS Example</h1>
+                      <p>Your input: <span id="user-input"></span></p>
+                      <script>
+                        var userInput = new URLSearchParams(window.location.search).get('input');
+                        document.getElementById('user-input').innerHTML = userInput;
+                      </script>
+                    </body>
+                  </html>
