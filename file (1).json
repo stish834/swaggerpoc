@@ -1,0 +1,9 @@
+{
+    "url": "https://raw.githubusercontent.com/Lu3ky13/swagger-XSS/main/file.yaml",
+    "urls": [
+        {
+            "url": "https://raw.githubusercontent.com/Lu3ky13/swagger-XSS/main/file.yaml",
+            "name": "Bar"
+        }
+    ]
+}
